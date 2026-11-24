@@ -1,0 +1,48 @@
+name: Releng.dev download
+description: >-
+  Fetches the build Releng.dev kept for this run, so a check looks at the same files every stop
+  ships, not a copy the run could have swapped. With stop, it fetches the build live at one of
+  this app's stops, so a check can compare the two. With from too, it fetches the version another
+  app has at one of its stops, so one app can be built from another's build.
+inputs:
+  from:
+    description: Another app's repository, to take its build instead of this app's.
+    required: false
+  stop:
+    description: >-
+      The stop whose build to take, such as production: this app's, or with from, the other
+      app's.
+    required: false
+  sbom:
+    description: >-
+      true to fetch only the build's SBOM, kept with releng-dev/upload and role: sbom. An SBOM
+      never comes down with the build's files.
+    required: false
+    default: "false"
+  optional:
+    description: >-
+      true to pass when the stop has no build yet, or that build kept no SBOM, with found set to
+      false, as on a first release. Otherwise that fails.
+    required: false
+    default: "false"
+  path:
+    description: Where to put the files.
+    required: false
+    default: build/
+  server:
+    description: >-
+      A team's own Releng.dev server, such as https://releng.example.com. Leave it out for hosted
+      Releng.dev. The environment variable RELENG_URL wins over it.
+    required: false
+outputs:
+  found:
+    description: true when files were fetched, false when optional let nothing pass.
+  version:
+    description: The version that was fetched.
+  build:
+    description: The build number that was fetched.
+  path:
+    description: The folder the files are in.
+runs:
+  using: node24
+  main: dist/index.js
